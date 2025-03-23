@@ -29,8 +29,28 @@ app.post("/create", async (req, res) => {
 // read user
 app.get("/read", async (req, res) => {
   let users = await userModel.find();
-
+  
   res.render("read", { users });
+});
+
+// edit user
+app.get("/edit/:userid", async (req, res) => {
+  let user = await userModel.findOne({ _id: req.params.userid });
+  
+  res.render("edit", { user });
+});
+
+// update user
+app.post("/update/:userid", async (req, res) => {
+  let { name, email, image } = req.body;
+  let user = await userModel.findOneAndUpdate(
+    { _id: req.params.userid },
+    { name, email, image },
+    { new: true }
+  );
+  
+  console.log("user updated");
+  res.redirect("/read");
 });
 
 // delete user
