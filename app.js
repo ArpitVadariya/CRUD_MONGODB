@@ -1,48 +1,43 @@
 const express = require("express");
 const app = express();
 const PORT = 3000;
+const path = require("path");
+const userModel = require("./models/user");
 
-const userModel = require("./usermodel");
+app.set("view engine", "ejs");
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
 
 // HomePage Route
 app.get("/", (req, res) => {
-  res.send("Hello");
+  res.render("index");
 });
 
-// Create Route
-app.get("/create", async (req, res) => {
+app.post("/create", async (req, res) => {
+  let { name, email, image } = req.body;
+
   let createdUser = await userModel.create({
-    name: "ARPIT PATEL",
-    username: "arpit",
-    email: "arpit@example.com",
+    name,
+    email,
+    image,
   });
   console.log("user created");
-  res.send(createdUser);
+  res.redirect("/read");
 });
 
-// update
-app.get("/update", async (req, res) => {
-  let updateUser = await userModel.findOneAndUpdate(
-    { email: "arpit@gmail.com" },
-    { username: "arpitpatel" },
-    { new: true }
-  );
-
-  res.json(updateUser.toObject()); // Send updated user as JSON
-});
-
-// read
+// read user
 app.get("/read", async (req, res) => {
   let users = await userModel.find();
 
-  res.send(users);
+  res.render("read", { users });
 });
 
-// delete
-app.get("/delete", async (req, res) => {
-  let user = await userModel.findOneAndDelete({ username: "arpitpatel" });
-
-  res.send(user);
+// delete user
+app.get("/delete/:id", async (req, res) => {
+  let user = await userModel.findOneAndDelete({ _id: req.params.id });
+  console.log("user deleted");
+  res.redirect("/read");
 });
 
 app.listen(PORT);
