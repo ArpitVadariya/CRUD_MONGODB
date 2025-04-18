@@ -16,6 +16,11 @@ const userSchema = mongoose.Schema({
   name: String,
   email: String,
   image: String,
+  universe: {
+    type: String,
+    enum: ["Marvel", "DC"], // restricts to only these two values
+    required: true,
+  },
 });
 
 module.exports = mongoose.model("user", userSchema);
